@@ -1,11 +1,19 @@
 import { Sets } from "./utils.ts";
- 
+
 export type RegexTree = Epsilon | Letter | Concat | Or | Star;
 
 export class IndexCounter {
-  private i: number = 0;
-  next() {
-    return this.i++;
+  private counter: number = 1;
+  private map: Map<number, Letter> = new Map();
+
+  next(leaf: Letter) {
+    const idx = this.counter++;
+    this.map.set(idx, leaf);
+    return idx;
+  }
+
+  get(i: number) {
+    return this.map.get(i);
   }
 }
 
@@ -16,6 +24,9 @@ export class Epsilon {
   last: Set<number> = Sets.empty();
   computeSelf(): void {}
   computeChild(): void {}
+  children(): RegexTree[] {
+    return [];
+  }
 }
 
 export class Letter {
@@ -27,8 +38,8 @@ export class Letter {
   next: Set<number> = Sets.empty();
   last: Set<number> = Sets.empty();
 
-  constructor(letter: string, id: number) {
-    this.id = id;
+  constructor(letter: string, counter: IndexCounter) {
+    this.id = counter.next(this);
     this.letter = letter;
   }
 
@@ -39,6 +50,9 @@ export class Letter {
   }
 
   computeChild(): void {}
+  children(): RegexTree[] {
+    return [];
+  }
 }
 
 export class Concat {
@@ -71,11 +85,15 @@ export class Concat {
   computeChild(): void {
     this.left.next = this.right.empty
       ? Sets.union(this.right.first, this.next)
-      : this.left.next = Sets.copy(this.right.first);
+      : (this.left.next = Sets.copy(this.right.first));
     this.right.next = Sets.copy(this.next);
 
     this.left.computeChild();
     this.right.computeChild();
+  }
+
+  children(): RegexTree[] {
+    return [this.left, this.right];
   }
 }
 
@@ -108,6 +126,10 @@ export class Or {
     this.left.computeChild();
     this.right.computeChild();
   }
+
+  children(): RegexTree[] {
+    return [this.left, this.right];
+  }
 }
 
 export class Star {
@@ -133,14 +155,18 @@ export class Star {
     this.child.next = Sets.union(this.next, this.child.first);
     this.child.computeChild();
   }
+
+  children(): RegexTree[] {
+    return [this.child];
+  }
 }
 
 export function epsilon() {
   return new Epsilon();
 }
 
-export function letter(letter: string, id: number) {
-  return new Letter(letter, id);
+export function letter(letter: string, counter: IndexCounter) {
+  return new Letter(letter, counter);
 }
 
 export function star(child: RegexTree) {
