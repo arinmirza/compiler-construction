@@ -15,4 +15,8 @@ deno compiler/tests/basic-test.ts
 egglog eggs/regex.egg
 ```
 
+## Screenshots
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/6f9560ff-503b-49c7-8d1b-4ab3bbb4dcbe" />
+
+
 [^1]: Egglog. A fixpoint reasoning system for equality saturation. See https://github.com/egraphs-good/egglog/
