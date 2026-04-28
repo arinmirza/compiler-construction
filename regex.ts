@@ -1,36 +1,24 @@
-type RegexTree = Epsilon | Letter | Concat | Or | Star;
+import { Sets } from "./utils.ts";
+ 
+export type RegexTree = Epsilon | Letter | Concat | Or | Star;
 
-namespace Sets {
-  export function empty<T>() {
-    return new Set<T>();
-  }
-  export function make<T>(a: T) {
-    return new Set([a]);
-  }
-  export function copy<T>(a: Set<T>) {
-    return new Set([...a]);
-  }
-  export function union<T>(a: Set<T>, b: Set<T>) {
-    return new Set([...a, ...b]);
-  }
-}
-
-class Counter {
+export class IndexCounter {
   private i: number = 0;
-  next() { return this.i++; }
+  next() {
+    return this.i++;
+  }
 }
 
-
-class Epsilon {
+export class Epsilon {
   empty: boolean = true;
   first: Set<number> = Sets.empty();
   next: Set<number> = Sets.empty();
   last: Set<number> = Sets.empty();
-  computeSelf(): void { }
-  computeChild(): void { }
+  computeSelf(): void {}
+  computeChild(): void {}
 }
 
-class Letter {
+export class Letter {
   id: number;
   letter: string;
 
@@ -49,11 +37,11 @@ class Letter {
     this.first = Sets.make(this.id);
     this.last = Sets.make(this.id);
   }
-  
-  computeChild(): void { }
+
+  computeChild(): void {}
 }
 
-class Concat {
+export class Concat {
   left: RegexTree;
   right: RegexTree;
 
@@ -61,7 +49,7 @@ class Concat {
   first: Set<number> = Sets.empty();
   next: Set<number> = Sets.empty();
   last: Set<number> = Sets.empty();
-  
+
   constructor(left: RegexTree, right: RegexTree) {
     this.left = left;
     this.right = right;
@@ -80,20 +68,20 @@ class Concat {
       : Sets.copy(this.right.last);
   }
 
-    computeChild(): void {
-      if (this.right.empty) {
-        this.left.next = Sets.union(this.right.first, this.next);
-      } else {
-        this.left.next = Sets.copy(this.right.first);
-      }
-      this.right.next = Sets.copy(this.next);
-      
-      this.left.computeChild();
-      this.right.computeChild();
+  computeChild(): void {
+    if (this.right.empty) {
+      this.left.next = Sets.union(this.right.first, this.next);
+    } else {
+      this.left.next = Sets.copy(this.right.first);
+    }
+    this.right.next = Sets.copy(this.next);
+
+    this.left.computeChild();
+    this.right.computeChild();
   }
 }
 
-class Or {
+export class Or {
   left: RegexTree;
   right: RegexTree;
 
@@ -123,7 +111,8 @@ class Or {
     this.right.computeChild();
   }
 }
-class Star {
+
+export class Star {
   child: RegexTree;
 
   empty: boolean = true;
@@ -148,44 +137,22 @@ class Star {
   }
 }
 
-function epsilon() { 
+export function epsilon() {
   return new Epsilon();
 }
-function letter(l: string, id: number) {
-  return new Letter(l, id); 
+
+export function letter(l: string, id: number) {
+  return new Letter(l, id);
 }
-function star(child: RegexTree) { 
-  return new Star(child); 
+
+export function star(child: RegexTree) {
+  return new Star(child);
 }
-function concat(left: RegexTree, right: RegexTree) { 
+
+export function concat(left: RegexTree, right: RegexTree) {
   return new Concat(left, right);
 }
-function or(left: RegexTree, right: RegexTree) { 
+
+export function or(left: RegexTree, right: RegexTree) {
   return new Or(left, right);
 }
-
-function serialize(tree: RegexTree) {
-
-}
-
-let counter = new Counter();
-let regex = 
-  concat(
-    star(
-      or(
-        letter("a", counter.next()), 
-        letter("b", counter.next())
-      )
-    ),
-    concat(
-      letter("a", counter.next()), 
-        or(
-          letter("a", counter.next()), 
-          letter("b", counter.next())
-        )
-    )
-  )
-
-regex.computeSelf();
-regex.computeChild();
-console.log(regex);
