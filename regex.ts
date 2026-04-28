@@ -6,7 +6,18 @@
 type RegexTree = Epsilon | Letter | Concat | Or | Star;
 
 namespace Sets {
-  
+  export function empty<T>() {
+    return new Set<T>();
+  }
+  export function make<T>(a: T) {
+    return new Set([a]);
+  }
+  export function copy<T>(a: Set<T>) {
+    return new Set([...a]);
+  }
+  export function union<T>(a: Set<T>, b: Set<T>) {
+    return new Set([...a, ...b]);
+  }
 }
 
 class Counter {
@@ -16,109 +27,129 @@ class Counter {
 
 
 class Epsilon {
-  _next: Set<number>;
-  empty(): boolean { return true; }
-  first(): Set<number> { return new Set(); }
-  last():  Set<number> { return new Set(); }
-  next(): Set<number> { return this._next; }
-  computeNext(): void {}
-  constructor() {
-    this._next = new Set();
-  }
+  empty: boolean = true;
+  first: Set<number> = Sets.empty();
+  next: Set<number> = Sets.empty();
+  last: Set<number> = Sets.empty();
+  computeSelf(): void { }
+  computeChild(): void { }
 }
 
 class Letter {
   id: number;
   letter: string;
-  _next: Set<number>;
+
+  empty: boolean = false;
+  first: Set<number> = Sets.empty();
+  next: Set<number> = Sets.empty();
+  last: Set<number> = Sets.empty();
+
   constructor(letter: string, id: number) {
     this.id = id;
     this.letter = letter;
-    this._next = new Set();
   }
-  empty(): boolean { return false; }
-  first(): Set<number> { return new Set([this.id]); }
-  last():  Set<number> { return new Set([this.id]); }
-  next(): Set<number> { return this._next; }
-  computeNext(): void {}
+
+  computeSelf(): void {
+    this.empty = false;
+    this.first = Sets.make(this.id);
+    this.last = Sets.make(this.id);
+  }
+  
+  computeChild(): void { }
 }
 
 class Concat {
   left: RegexTree;
   right: RegexTree;
-  _next: Set<number>;
+
+  empty: boolean = false;
+  first: Set<number> = Sets.empty();
+  next: Set<number> = Sets.empty();
+  last: Set<number> = Sets.empty();
+  
   constructor(left: RegexTree, right: RegexTree) {
     this.left = left;
     this.right = right;
-    this._next = new Set();
   }
-  empty(): boolean { return this.left.empty() && this.right.empty(); }
-  first(): Set<number> {
-    return this.left.empty()
-      ? new Set([...this.left.first(), ...this.right.first()])
-      : new Set([...this.left.first()]);
+
+  computeSelf(): void {
+    this.left.computeSelf();
+    this.right.computeSelf();
+
+    this.empty = this.left.empty && this.right.empty;
+    this.first = this.left.empty
+      ? Sets.union(this.left.first, this.right.first)
+      : Sets.copy(this.left.first);
+    this.last = this.right.empty
+      ? Sets.union(this.right.last, this.left.last)
+      : Sets.copy(this.right.last);
   }
-  last():  Set<number> { 
-    return this.right.empty()
-      ? new Set([...this.right.last(), ...this.left.last()])
-      : new Set([...this.right.last()]);
-  }
-  next(): Set<number> { return this._next; }
-  computeNext(): void {
-    if (this.right.empty()) {
-      this.left._next = new Set([...this.right.first(), ...this._next])
-    } else {
-      this.left._next = new Set([...this.right.first()]);
-    }
-    this.right._next = new Set([...this._next]);
-    this.left.computeNext();
-    this.right.computeNext();
+
+    computeChild(): void {
+      if (this.right.empty) {
+        this.left.next = Sets.union(this.right.first, this.next);
+      } else {
+        this.left.next = Sets.copy(this.right.first);
+      }
+      this.right.next = Sets.copy(this.next);
+      
+      this.left.computeChild();
+      this.right.computeChild();
   }
 }
 
 class Or {
   left: RegexTree;
   right: RegexTree;
-  _next: Set<number>;
+
+  empty: boolean = false;
+  first: Set<number> = Sets.empty();
+  next: Set<number> = Sets.empty();
+  last: Set<number> = Sets.empty();
+
   constructor(left: RegexTree, right: RegexTree) {
     this.left = left;
     this.right = right;
-    this._next = new Set();
+  }
 
+  computeSelf(): void {
+    this.left.computeSelf();
+    this.right.computeSelf();
+
+    this.empty = this.left.empty || this.right.empty;
+    this.first = Sets.union(this.left.first, this.right.first);
+    this.last = Sets.union(this.left.last, this.right.last);
   }
-  empty(): boolean { return this.left.empty() || this.right.empty(); }
-  first(): Set<number> {
-    return new Set([...this.left.first(), ...this.right.first()]);
-  }
-  last(): Set<number> {
-    return new Set([...this.left.last(), ...this.right.last()]);
-  }
-  next(): Set<number> { return this._next; }
-  computeNext(): void {
-    this.right._next = new Set([...this._next]);
-    this.left._next = new Set([...this._next]);
-    this.left.computeNext();
-    this.right.computeNext();
+
+  computeChild(): void {
+    this.left.next = Sets.copy(this.next);
+    this.right.next = Sets.copy(this.next);
+    this.left.computeChild();
+    this.right.computeChild();
   }
 }
 class Star {
   child: RegexTree;
-  _next: Set<number>;
+
+  empty: boolean = true;
+  first: Set<number> = Sets.empty();
+  next: Set<number> = Sets.empty();
+  last: Set<number> = Sets.empty();
+
   constructor(child: RegexTree) {
     this.child = child;
-    this._next = new Set();
   }
-  empty(): boolean { return true; }
-  first(): Set<number> {
-    return new Set([...this.child.first()]);
+
+  computeSelf(): void {
+    this.child.computeSelf();
+    this.empty = true;
+    this.first = Sets.copy(this.child.first);
+    this.last = Sets.copy(this.child.last);
   }
-  last(): Set<number> {
-    return new Set([...this.child.last()]);
-  }
-  next(): Set<number> { return this._next; }
-  computeNext(): void {
-    this.child._next = new Set([...this._next, ...this.child.first()]);
-    this.child.computeNext();
+
+  computeChild(): void {
+    this.child.next = Sets.union(this.next, this.child.first);
+    this.child.computeChild();
   }
 }
 
@@ -160,5 +191,6 @@ let regex =
     )
   )
 
-regex.computeNext();
+regex.computeSelf();
+regex.computeChild();
 console.log(regex);
