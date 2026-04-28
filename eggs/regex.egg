@@ -1,96 +1,15 @@
-
-(datatype Symbol
-  (Char i64 String)
+(datatype RegexTree
+  (Epsilon)
+  (Letter i64 String)
+  (Concat RegexTree RegexTree)
+  (Or RegexTree RegexTree)
+  (Star RegexTree)
+  (Opt RegexTree)
 )
 
-(sort SymbolSet (Set Symbol))
+(sort IntSet (Set i64))
 
-(datatype Regex
-  (Concat Regex Regex)
-  (Pipe Regex Regex)
-  (Star Regex)
-  (Opt Regex)
-  (Input Symbol)
-)
-
-(relation empty (Regex))
-
-(rule ((= regex (Pipe r1 r2)) (empty r1)) ((empty regex)))
-(rule ((= regex (Pipe r1 r2)) (empty r2)) ((empty regex)))
-(rule ((= regex (Concat r1 r2)) (empty r1) (empty r2)) ((empty regex)))
-(rule ((= regex (Star r1))) ((empty regex)))
-(rule ((= regex (Opt r1))) ((empty regex)))
-(rule ((= regex (Input (Char i "")))) ((empty regex)))
-
-(function first (Regex) SymbolSet :merge (set-union old new))
-
-(rule 
-  (
-    (= regex (Pipe r1 r2))
-    (= value (set-union (first r1) (first r2)))
-  )
-  ((set (first regex) value))
-)
-
-(rule 
-  (
-    (= regex (Concat r1 r2))
-    (= value (first r1))
-  )
-  ((set (first regex) value))
-)
-
-
-(rule 
-  (
-    (= regex (Concat r1 r2))
-    (empty r1)
-    (= value (first r2))
-  )
-  ((set (first regex) value))
-)
-
-(rule 
-  (
-    (= regex (Star r1))
-    (= value (first r1))
-  )
-  ((set (first regex) value))
-)
-
-(rule 
-  (
-    (= regex (Opt r1))
-    (= value (first r1))
-  )
-  ((set (first regex) value))
-)
-
-(rule 
-  (
-    (= regex (Input (Char i c)))
-    (!= c "")
-  )
-  ((set (first regex) (set-of (Char i c))))
-)
-
-
-
-(let my-regex
-  (Concat
-    (Star (Pipe 
-            (Input (Char 0 "a")) 
-            (Input (Char 1 "b"))
-          )
-    )
-    (Concat 
-      (Input (Char 2 "a"))
-      (Pipe 
-        (Input (Char 3 "a")) 
-        (Input (Char 4 "b"))
-      )
-    )
-  )
-)
-
-(run-schedule (saturate (run)))
+(relation empty (RegexTree))
+(function first (RegexTree) IntSet :merge (set-union old new))
+(function next  (RegexTree) IntSet :merge (set-union old new)) 
+(function last  (RegexTree) IntSet :merge (set-union old new))
