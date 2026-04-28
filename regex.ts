@@ -1,8 +1,3 @@
-// type Epsilon = { type: 'epsilon' }
-// type Letter = { type: 'letter'; id: number; char: string; };
-// type Concat = { type: 'concat'; left: RegexTree; right: RegexTree };
-// type Or = { type: 'or'; left: RegexTree; right: RegexTree };
-// type Star = { type: 'star'; child: RegexTree };
 type RegexTree = Epsilon | Letter | Concat | Or | Star;
 
 namespace Sets {
