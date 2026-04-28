@@ -4,7 +4,7 @@ This repository contains my notes and implementations for the *Compiler Construc
 
 ## Folders
 - The compiler implemented in Typescript is under the `compiler` folder.
-- The experimental implementation in egglog (fixpoint reasoning system for equality saturation) is under the `eggs` folder.
+- The experimental implementation in egglog[^1] (fixpoint reasoning system for equality saturation) is under the `eggs` folder.
 - Interesting stuff worth discussing and the progress of the project is documented in `journal.md`
 
 ## Usage
@@ -14,3 +14,5 @@ deno compiler/tests/basic-test.ts
 ```bash
 egglog eggs/regex.egg
 ```
+
+[^1]: See https://github.com/egraphs-good/egglog/
