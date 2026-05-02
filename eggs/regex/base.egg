@@ -1,0 +1,15 @@
+(datatype RegexTree
+  (Epsilon)
+  (Letter i64 String)
+  (Concat RegexTree RegexTree)
+  (Or RegexTree RegexTree)
+  (Star RegexTree)
+  (Opt RegexTree)
+)
+
+(sort IntSet (Set i64))
+
+(relation empty (RegexTree))
+(function first (RegexTree) IntSet :merge (set-union old new))
+(function next  (RegexTree) IntSet :merge (set-union old new)) 
+(function last  (RegexTree) IntSet :merge (set-union old new))

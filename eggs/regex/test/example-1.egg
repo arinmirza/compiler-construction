@@ -1,0 +1,44 @@
+(push)
+
+(let a0 (Letter 0 "a"))
+(let b1 (Letter 1 "b"))
+(let a2 (Letter 2 "a"))
+(let a3 (Letter 3 "a"))
+(let b4 (Letter 4 "b"))
+
+(let a3|b4 (Or a3 b4))
+(let a2xa3|b4 (Concat a2 a3|b4))
+
+(let a0|b1 (Or a0 b1))
+(let a0|b1* (Star a0|b1))
+
+(let root (Concat a0|b1* a2xa3|b4))
+
+(run-schedule (saturate (run)))
+
+(check (= (first root) (set-of 0 1 2)))
+(check (= (last  root) (set-of 3 4)))
+(check (= (next  root) (set-of)))
+(fail (check (empty root)))
+
+(check (= (first a0|b1*) (set-of 0 1)))
+(check (= (last  a0|b1*) (set-of 0 1)))
+(check (= (next  a0|b1*) (set-of 2)))
+(check (empty a0|b1*))
+
+(check (= (first a0|b1) (set-of 0 1)))
+(check (= (last  a0|b1) (set-of 0 1)))
+(check (= (next  a0|b1) (set-of 0 1 2)))
+(fail (check (empty a0|b1)))
+
+(check (= (first a2xa3|b4) (set-of 2)))
+(check (= (last  a2xa3|b4) (set-of 3 4)))
+(check (= (next  a2xa3|b4) (set-of)))
+(fail (check (empty a2xa3|b4)))
+
+(check (= (first a3|b4) (set-of 3 4)))
+(check (= (last  a3|b4) (set-of 3 4)))
+(check (= (next  a3|b4) (set-of)))
+(fail (check (empty a3|b4)))
+
+(pop)
