@@ -8,8 +8,8 @@ Navigate to the directory of interest.
 Then run:
 
 ```bash
-egglog base.egg analyses/*.egg test/*.egg
+egglog base.egg analyses/*.egg tests/*.egg
 ```
 - `base.egg` is the base declaration file of sorts.
 - Includes all analyses under `analyses/`
-- Executes all tests under `test/`
+- Executes all tests under `tests/`
