@@ -1,3 +1,4 @@
+(push)
 
 (let a0 (Letter 0 "a"))
 (let b1 (Letter 1 "b"))
@@ -39,3 +40,5 @@
 (check (= (last  a3|b4) (set-of 3 4)))
 (check (= (next  a3|b4) (set-of)))
 (fail (check (empty a3|b4)))
+
+(pop)
