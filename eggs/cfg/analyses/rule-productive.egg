@@ -1,0 +1,7 @@
+(rule
+  (
+    (= prule (Rule nonTerminal pattern))
+    (pattern-productive pattern)
+  )
+  ((rule-productive prule))
+)

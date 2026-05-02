@@ -1,0 +1,38 @@
+(push)
+
+(let pattern-0 (PatternNil))
+
+(let pattern-1 (PatternCons (Epsilon) (PatternNil)))
+(let pattern-2 (PatternCons (Terminal "a") (PatternNil)))
+(let pattern-3 (PatternCons (NonTerminal "A") (PatternNil)))
+
+(let pattern-4 (PatternCons (Terminal "a") 
+                 (PatternCons (NonTerminal "B")
+                   (PatternCons (NonTerminal "B") 
+                     (PatternNil)))))
+
+(let pattern-5 (PatternCons (Terminal "a") 
+                 (PatternCons (NonTerminal "B")
+                   (PatternCons (NonTerminal "C")
+                     (PatternCons (NonTerminal "B") 
+                       (PatternNil))))))
+
+
+(run-schedule (saturate (run)))
+
+(check (= (pattern-consumes pattern-0) (set-empty)))
+(check (= (pattern-consumes pattern-1) (set-empty)))
+(check (= (pattern-consumes pattern-2) (set-empty)))
+(check (= (pattern-consumes pattern-3) (set-of (NonTerminal "A"))))
+(check (= (pattern-consumes pattern-4) (set-of (NonTerminal "B"))))
+(check (= (pattern-consumes pattern-5) (set-of (NonTerminal "B") 
+                                               (NonTerminal "C"))))
+
+(check (pattern-productive pattern-0))
+(check (pattern-productive pattern-1))
+(check (pattern-productive pattern-2))
+(fail (check (pattern-productive pattern-3)))
+(fail (check (pattern-productive pattern-4)))
+(fail (check (pattern-productive pattern-5)))
+
+(pop)

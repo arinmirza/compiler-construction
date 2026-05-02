@@ -1,0 +1,16 @@
+(push)
+
+(let pattern-1 (PatternCons (Terminal "a") (PatternNil)))
+(let pattern-2 (PatternCons (NonTerminal "A") (PatternNil)))
+
+(let rule-1 (Rule (NonTerminal "S") pattern-1))
+(let rule-2 (Rule (NonTerminal "S") pattern-2))
+(let rule-3 (Rule (NonTerminal "A") pattern-1))
+
+(run-schedule (saturate (run)))
+
+(check (rule-productive rule-1))
+(check (rule-productive rule-2))
+(check (rule-productive rule-3))
+
+(pop)

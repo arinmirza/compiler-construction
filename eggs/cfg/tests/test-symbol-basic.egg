@@ -1,0 +1,20 @@
+(push)
+
+(let epsilon (Epsilon))
+(let terminal (Terminal "a"))
+(let nonterminal (NonTerminal "A"))
+
+(let rule-1 (Rule (NonTerminal "S")
+  (PatternCons nonterminal (PatternNil))))
+
+(run-schedule (saturate (run)))
+
+(check (symbol-productive epsilon))
+(check (symbol-productive terminal))
+(fail (check (symbol-productive nonterminal)))
+(check (symbol-reachable nonterminal))
+
+; symbols other than non-terminals do not have a reachability value
+(fail (check (symbol-reachable terminal)))
+
+(pop)

@@ -1,0 +1,17 @@
+; populate the set of productive non-terminals (monotone underapprox)
+(rule
+  (
+    (= symbol (NonTerminal _))
+    (symbol-productive symbol)
+  )
+  ((set (productive-non-terminals ()) (set-of symbol)))
+)
+
+; populate the set of reachable non-terminals (monotone underapprox)
+(rule
+  (
+    (= symbol (NonTerminal _))
+    (symbol-reachable symbol)
+  )
+  ((set (reachable-non-terminals ()) (set-of symbol)))
+)

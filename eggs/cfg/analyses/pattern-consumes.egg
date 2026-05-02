@@ -1,0 +1,31 @@
+(rule
+  ((= pattern (PatternNil)))
+  ((set (pattern-consumes pattern) (set-empty)))
+)
+
+(rule
+  (
+    (= pattern (PatternCons symbol rest))
+    (= symbol (Epsilon))
+    (= consumed (pattern-consumes rest))
+  )
+  ((set (pattern-consumes pattern) consumed))
+)
+
+(rule
+  (
+    (= pattern (PatternCons symbol rest))
+    (= symbol (Terminal _))
+    (= consumed (pattern-consumes rest))
+  )
+  ((set (pattern-consumes pattern) consumed))
+)
+
+(rule
+  (
+    (= pattern (PatternCons symbol rest))
+    (= symbol (NonTerminal _))
+    (= consumed (set-union (set-of symbol) (pattern-consumes rest)))
+  )
+  ((set (pattern-consumes pattern) consumed))
+)

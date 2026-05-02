@@ -1,0 +1,79 @@
+; ======== Example 1 ========================================================= ;
+
+; Represents the following grammar:
+; S -> aBB | bD
+; A -> Bc
+; B -> Sd | c  
+; C -> a
+; D -> BD
+
+(push)
+
+(let rule-S1 (Rule (NonTerminal "S")
+              (PatternCons (Terminal "a")
+                (PatternCons (NonTerminal "B")
+                  (PatternCons (NonTerminal "B") 
+                    (PatternNil))))
+            )
+)
+
+(let rule-S2 (Rule (NonTerminal "S")
+              (PatternCons (Terminal "b")
+                (PatternCons (NonTerminal "D")
+                  (PatternNil)))
+            )
+)
+
+(let rule-A1 (Rule (NonTerminal "A")
+              (PatternCons (NonTerminal "B")
+                (PatternCons (Terminal "c")
+                  (PatternNil)))
+            )
+)
+
+(let rule-B1 (Rule (NonTerminal "B")
+              (PatternCons (NonTerminal "S")
+                (PatternCons (Terminal "d")
+                  (PatternNil)))
+            )
+)
+
+(let rule-B2 (Rule (NonTerminal "B")
+              (PatternCons (NonTerminal "C")
+                (PatternNil))
+            )
+)
+
+(let rule-C1 (Rule (NonTerminal "C")
+              (PatternCons (Terminal "a")
+                (PatternNil))
+            )
+)
+
+(let rule-D1 (Rule (NonTerminal "D")
+              (PatternCons (NonTerminal "B")
+                (PatternCons (NonTerminal "D")
+                  (PatternNil)))
+            )
+)
+
+(run-schedule (saturate (run)))
+
+(check (symbol-productive (NonTerminal "S")))
+(check (symbol-productive (NonTerminal "A")))
+(check (symbol-productive (NonTerminal "B")))
+(check (symbol-productive (NonTerminal "C")))
+(fail (check (symbol-productive (NonTerminal "D"))))
+
+(check (symbol-reachable (NonTerminal "S")))
+(check (symbol-reachable (NonTerminal "B")))
+(check (symbol-reachable (NonTerminal "C")))
+(check (symbol-reachable (NonTerminal "D")))
+(fail (check (symbol-reachable (NonTerminal "A"))))
+
+(extract (productive-non-terminals ()))
+(extract (reachable-non-terminals ()))
+(extract (set-intersect (productive-non-terminals ()) 
+                        (reachable-non-terminals ())))
+                        
+(pop)

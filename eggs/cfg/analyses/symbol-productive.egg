@@ -1,0 +1,9 @@
+(rule
+  ((= symbol (Epsilon)))
+  ((symbol-productive symbol))
+)
+
+(rule
+  ((= symbol (Terminal _)))
+  ((symbol-productive symbol))
+)

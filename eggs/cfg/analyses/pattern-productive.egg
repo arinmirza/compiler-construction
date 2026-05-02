@@ -1,0 +1,32 @@
+(rule
+  ((= pattern (PatternNil)))
+  ((pattern-productive pattern))
+)
+
+(rule
+  (
+    (= pattern (PatternCons symbol rest))
+    (pattern-productive rest)
+    (symbol-productive symbol)
+  )
+  ((pattern-productive pattern))
+)
+
+(rule
+  (
+    (= pattern (PatternCons symbol rest))
+    (= (set-empty) (pattern-consumes pattern))
+  )
+  ((pattern-productive pattern))
+)
+
+; if a rule is productive, the LHS non-terminal becomes productive
+(rule
+  (
+    (= prule (Rule producer pattern))
+    (pattern-productive pattern)
+  )
+  (
+    (symbol-productive producer)
+  )
+)

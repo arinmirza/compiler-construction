@@ -1,0 +1,25 @@
+(datatype Symbol
+  (Epsilon)
+  (Terminal String)
+  (NonTerminal String)
+)
+
+(datatype Pattern
+  (PatternNil)
+  (PatternCons Symbol Pattern)
+)
+
+(datatype Grammar 
+  (Rule Symbol Pattern)
+)
+
+(sort SymbolSet (Set Symbol))
+
+(function pattern-consumes (Pattern) SymbolSet :no-merge)
+(relation pattern-productive (Pattern))
+(relation rule-productive (Grammar))
+(relation symbol-productive (Symbol))
+(relation symbol-reachable (Symbol))
+
+(function productive-non-terminals (Unit) SymbolSet :merge (set-union old new))
+(function reachable-non-terminals (Unit) SymbolSet :merge (set-union old new))

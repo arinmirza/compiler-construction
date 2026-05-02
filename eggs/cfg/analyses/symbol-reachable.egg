@@ -1,0 +1,35 @@
+(rule
+  (
+    ; there exists a non-terminal
+    (= symbol (NonTerminal _))
+    ; and there exists a rule
+    (= prule (Rule producer pattern))
+    ; such that the rule consumes the non-terminal
+    (= consumed (pattern-consumes pattern))
+    (set-contains consumed symbol)
+    ; and the producer of the rule is reachable
+    (symbol-reachable producer)
+  )
+  ; then that symbol is reachable
+  ((symbol-reachable symbol))
+)
+
+(rule
+  (
+    ; there exists a non-terminal
+    (= symbol (NonTerminal _))
+    ; and there exists a rule for the starting symbol
+    (= prule (Rule (NonTerminal "S") pattern))
+    ; such that the starting rule consumes the non-terminal
+    (= consumed (pattern-consumes pattern))
+    (set-contains consumed symbol)
+  )
+  ; then that symbol is reachable
+  ((symbol-reachable symbol))
+)
+
+; starting symbol is always reachable
+(rule
+  ((NonTerminal "S"))
+  ((symbol-reachable (NonTerminal "S")))
+)
