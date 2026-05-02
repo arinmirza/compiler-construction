@@ -1,22 +1,17 @@
 /**
  * Context Free Grammars
  * 
- * The implementation is incorrect.
- * 
  */
 
+import { UniqueSet } from "./unique-set.ts";
 import { Sets } from "./utils.ts";
 
+
 export namespace CFG {
-  //export type Terminal = { terminal: true, value: string };
-  //export type NonTerminal = { terminal: false, value: string };
   export type Symbol = Terminal | NonTerminal;
-  //export type Pattern = Symbol[];
-  export type Ruleset = Map<Symbol, Pattern[]>;
 
   export class Terminal {
     readonly value: string;
-    consumedBy = new UniqueSet<Pattern>(); 
     
     constructor(value: string) {
       this.value = value;
@@ -25,11 +20,14 @@ export namespace CFG {
     equals(o: Symbol) {
       return this.value == o.value;
     }
+
+    toString() {
+      return this.value;
+    }
   }
 
   export class NonTerminal {
     readonly value: string;
-    consumedBy = new UniqueSet<Pattern>(); 
 
     constructor(value: string) {
       this.value = value;
@@ -38,84 +36,36 @@ export namespace CFG {
     equals (o: Symbol) {
       return this.value === o.value;
     }
-  }
 
-  export class Pattern {
-    readonly symbols: Symbol[] = [];
-    consumes: UniqueSet<NonTerminal> = new UniqueSet();
-
-    constructor(symbols: Symbol[]) {
-      this.symbols = symbols;
-      symbols.forEach(symbol => {
-        symbol.consumedBy.add(this);
-        if(symbol instanceof NonTerminal) {
-          this.consumes.add(symbol);
-        }
-      }
-      )
+    toString() {
+      return this.value;
     }
-
-    equals (o: Pattern) {
-      return this.symbols.length == o.symbols.length && this.symbols.every((s, i) => s.equals(o.symbols[i]));
-    }
-  }
-
-  type EqualityFn<T> = (a: T) => boolean;
-  type Comparable<T> = { equals: EqualityFn<T> };
-
-  export class UniqueSet<T extends Comparable<T>> {
-    elements: T[] = [];
-
-    get(a: T) {
-      return this.elements.find(e => a.equals(e));
-    }
-
-    has(a: T) {
-      return !!this.elements.find(e => a.equals(e));
-    }
-
-    filter(predicate: (a: T) => boolean) {
-      return this.elements.filter(predicate);
-    }
-
-    empty() {
-      return this.elements.length == 0;
-    }
-
-    add(a: T) {
-      const existing = this.elements.find(e => a.equals(e));
-      if (existing) {
-        return existing;
-      }
-      this.elements.push(a);
-      return a;
-    }
-    
   }
 
   export class Rule {
     readonly idx: number;
     readonly producer: NonTerminal;
-    readonly pattern: Pattern;
+    readonly pattern: Symbol[] = [];
+    readonly uniqueNonTerminals: UniqueSet<NonTerminal>;
 
-    constructor(producer: NonTerminal, idx: number, pattern: Pattern) {
+    constructor(producer: NonTerminal, idx: number, pattern: Symbol[]) {
       this.idx = idx;
       this.producer = producer;
       this.pattern = pattern;
+      this.uniqueNonTerminals = UniqueSet.from(pattern
+        .filter(s => s instanceof NonTerminal));
     }
-
-    get consumes() {
-      return this.pattern.consumes;
-    }
-
-    productive(grammar: CFG.Grammar) {
-      return this.pattern.consumes.empty() ||
-      this.pattern.consumes.elements.every(nonTerminal => grammar.getRulesFor(nonTerminal).some(rule => rule.productive));
-    }
-
 
     equals(o: Rule) {
-      return this.idx === o.idx && this.producer.equals(o.producer) && this.pattern.equals(o.pattern);
+      return this.idx === o.idx && 
+      this.producer.equals(o.producer) &&
+      this.pattern.length == o.pattern.length && 
+      this.pattern.every((s, i) => s.equals(o.pattern[i]));
+    }
+
+    toString() {
+      const pattern = this.pattern.map(s => s.value).join('')
+      return `[${this.producer.value} --> ${pattern}]`
     }
   }
 
@@ -127,71 +77,134 @@ export namespace CFG {
         return symbol === symbol.toUpperCase()
         ? new NonTerminal(symbol)
         : new Terminal(symbol);
-      }
+    }
+
+    private addSymbol(symbol: Symbol) {
+      return this.symbols.add(symbol);
+    }
 
     getRulesFor(symbol: Symbol) {
       return this.rules.filter(rule => rule.producer.equals(symbol));
     }
 
-    get terminals() {
+    get terminals(): Terminal[] {
       return this.symbols.filter(a => a instanceof CFG.Terminal);
     }
 
-    get nonTerminals() {
+    get nonTerminals(): NonTerminal[] {
       return this.symbols.filter(a => a instanceof CFG.NonTerminal);
     }
 
-    addRule(symbol: string, patterns: string[]) {
+    addRules(symbol: string, patterns: string[]) {
 
       let _producer = this.symbols.add(new NonTerminal(symbol));
-
-      
       
       for (const pattern of patterns) {
         const _idx = this.getRulesFor(_producer).length;
-        const _pattern = new Pattern(
-          [...pattern].map((c) => this.makeSymbol(c)),
-        );
+        const _pattern = 
+          [...pattern].map((c) => this.addSymbol(this.makeSymbol(c)));
         const _rule = new Rule(_producer, _idx, _pattern);
         this.rules.add(_rule);
-
-        
       }
     }
 
   }
 }
 
-let count;
-let rhs;
-
 function computeProductive(grammar: CFG.Grammar) {
-  let result = new CFG.UniqueSet<CFG.NonTerminal>();
-  let produces = new Map<CFG.NonTerminal, CFG.UniqueSet<CFG.Pattern>>();
+  // Set of productive non-terminals
+  let result = new UniqueSet<CFG.NonTerminal>();
+  // Maps a nonterminal to rules using it
+  let usersOf = new Map<CFG.NonTerminal, UniqueSet<CFG.Rule>>();
+  // Maps a rule to number of unique non-terminals that needs to be productive
+  let count = new Map<CFG.Rule, number>();
 
-  let analysis = {
-    productive: new Set<CFG.Rule>
+  // initialize
+  for (const nonTerminal of grammar.nonTerminals) {
+    usersOf.set(nonTerminal, new UniqueSet<CFG.Rule>());
+  }
+  for (const rule of grammar.rules) {
+    count.set(rule, 0);
+    for (const nonTerminal of rule.uniqueNonTerminals) {
+        count.set(rule, count.get(rule)! + 1);
+        usersOf.get(nonTerminal)!.add(rule);
+    }
   }
 
+  let workset = grammar.rules.filter(rule => count.get(rule) == 0);
+  
+  while (workset.length) {
+    console.debug(`Workset is: {${workset.map(e => e.toString()).join(', ')}}`);
+    const rule = workset.pop()!;
+    
+    if (!result.has(rule.producer)) {
+      console.debug(rule.toString(), " was not in the result, so adding it.");
+      result.add(rule.producer);
+
+      const users = usersOf.get(rule.producer)?.elements ?? [];
+      for (const user of users) {
+        const value = count.get(user)! - 1;
+        count.set(user, value);
+        console.debug(`Decreasing count of ${user.toString()} because it uses ${rule.producer.value}`);
+        if (value == 0) {
+          workset.push(user);
+          console.debug(`Value of ${user.producer.value} became 0 so adding it to workset.`);
+        }
+      }
+    }
+  }
+
+  return {result, usersOf, count};
+
 }
 
-function makeTerminal(value: string) {
-  return { terminal: true, value };
-}
-function makeNonTerminal(value: string) {
-  return { terminal: true, value };
+function computeReachable(grammar: CFG.Grammar) {
+  let depends = new Map<CFG.NonTerminal, UniqueSet<CFG.NonTerminal>>();
+  let reaches = new Map<CFG.NonTerminal, UniqueSet<CFG.NonTerminal>>();
+
+  for (const rule of grammar.rules) {
+    for (const nonTerminal of rule.uniqueNonTerminals) {
+      if (!depends.get(nonTerminal)) {
+        depends.set(nonTerminal, new UniqueSet());
+      }
+      if (!reaches.get(rule.producer)) {
+        reaches.set(rule.producer, new UniqueSet());
+      }
+      depends.get(nonTerminal)!.add(rule.producer);
+      reaches.get(rule.producer)!.add(nonTerminal);
+    }
+  }
+
+  let reachable = new UniqueSet<CFG.NonTerminal>();
+  const start = grammar.nonTerminals.find(s => s.value === "S")!;
+  dfs(start);
+  
+
+  function dfs(node: CFG.NonTerminal) {
+    reachable.add(node);
+    const children = reaches.get(node) ?? [];
+    for (const child of children) {
+      if (reachable.has(child)) {
+        continue;
+      }
+      dfs(child);
+    }
+  }
+
+  return reachable;
 }
 
 let example = new CFG.Grammar();
-example.addRule("S", ["aBB", "bD", "a"]);
-example.addRule("A", ["Bc"]);
-example.addRule("B", ["Sd", "C"]);
-example.addRule("C", ["a"]);
-example.addRule("D", ["BD"]);
+example.addRules("S", ["aBB", "bD"]);
+example.addRules("A", ["Bc"]);
+example.addRules("B", ["Sd", "C"]);
+example.addRules("C", ["a"]);
+example.addRules("D", ["BD"]);
 
-//const result = computeProductive(example);
 
-const x = example.getRulesFor(new CFG.NonTerminal("D"))[0];
-console.log(x.productive(example))
-
-console.log(example);
+const productive = computeProductive(example).result;
+const reachable = computeReachable(example);
+const productiveAndReachable = UniqueSet.intersect(productive, reachable);
+console.log("Productive non-terminals:", productive);
+console.log("Reachable non-terminals:", reachable)
+console.log("Produtive and reachable non-terminals:", productiveAndReachable);
