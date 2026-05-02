@@ -1,11 +1,15 @@
 ## Usage
 
-Navigate to `eggs` directory. Then run:
+Navigate to the directory of interest.
+
+- `eggs/regex/` scannar implementation
+- `eggs/cfg/` context-free grammars
+
+Then run:
 
 ```bash
-egglog regex.egg analyses/*.egg test/example-1.egg
+egglog base.egg analyses/*.egg test/*.egg
 ```
-
-- `regex.egg` is the base declaration file of sorts.
-- Includes all analyses (first, last, next, empty).
-- Executes the test `example-1.egg`
+- `base.egg` is the base declaration file of sorts.
+- Includes all analyses under `analyses/`
+- Executes all tests under `test/`
