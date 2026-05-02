@@ -19,8 +19,8 @@
   - Rightmost derivations correspond to a bottom-up reconstruction of the syntax tree.
 - Uniqueness of context free grammars is undecidable.
 - A nonterminal $A$ is called to be
-  - productive, if $A\to^*w$ for some word $w \in T^*$
-  - reachable, if $S\to^*\alpha A \beta$ for suitable $a, b \in (T \cup N)^*$.
+  - productive, if $A\to^\ast w$ for some word $w \in T^\ast$
+  - reachable, if $S\to^\ast \alpha A \beta$ for suitable $a, b \in (T \cup N)^\ast$.
 
 ## 2026-04-30
 - [ ] Todo: Add handwritten notes from the exercise session here. 
