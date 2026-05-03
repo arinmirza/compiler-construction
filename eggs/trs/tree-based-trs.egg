@@ -1,0 +1,52 @@
+; The problem with this approach is that concatenation allows for 
+; different representations of the same pattern.
+; We cannot check if a pattern is in the language without constructing
+; the right shape.
+; Requires associativity and commutativity, which is very expensive.
+
+(datatype Pattern
+  (NonTerminal String :cost 100)
+  (Terminal String :cost 0)
+  (Concat Pattern Pattern :cost 0)
+)
+
+(rewrite
+  (NonTerminal "S")
+  (Concat (Terminal "a") (Concat (NonTerminal "B") (NonTerminal "B")))
+)
+
+(rewrite
+  (NonTerminal "S")
+  (Concat (Terminal "b") (NonTerminal "D"))
+)
+
+(rewrite
+  (NonTerminal "A")
+  (Concat (NonTerminal "B") (Terminal "c"))
+)
+
+(rewrite
+  (NonTerminal "B")
+  (Concat (NonTerminal "S") (Terminal "d"))
+)
+
+(rewrite
+  (NonTerminal "B")
+  (NonTerminal "C")
+)
+
+(rewrite
+  (NonTerminal "C")
+  (Terminal "a")
+)
+
+(rewrite
+  (NonTerminal "D")
+  (Concat (NonTerminal "B") (NonTerminal "D"))
+)
+
+(let start (NonTerminal "S"))
+
+(run-schedule (saturate (run)))
+
+(extract start)

@@ -1,0 +1,58 @@
+; Causes (infinite) term explosion. This is the first time I am encountering
+; this without the presence of e-cycles combined with associativity rule.
+; It seems like we can keep generating infinitely many novel subterms
+; when using a list container. 
+
+(datatype Symbol
+  (NonTerminal String)
+  (Terminal String)
+)
+
+(datatype Pattern
+  (Nil)
+  (Pat Symbol Pattern)
+)
+
+
+(rewrite
+  (Pat (NonTerminal "S") rest)
+  (Pat (Terminal "a") (Pat (NonTerminal "B") (Pat (NonTerminal "B") rest)))
+)
+
+(rewrite
+  (Pat (NonTerminal "S") rest)
+  (Pat (Terminal "b") (Pat (NonTerminal "D") rest))
+)
+
+(rewrite
+  (Pat (NonTerminal "A") rest)
+  (Pat (NonTerminal "B") (Pat (Terminal "c") rest))
+)
+
+(rewrite
+  (Pat (NonTerminal "B") rest)
+  (Pat (NonTerminal "S") (Pat (Terminal "d") rest))
+)
+
+(rewrite
+  (Pat (NonTerminal "B") rest)
+  (Pat (NonTerminal "C") rest)
+)
+
+(rewrite
+  (Pat (NonTerminal "C") rest)
+  (Pat (Terminal "a") rest)
+)
+
+(rewrite
+  (Pat (NonTerminal "D") rest)
+  (Pat (NonTerminal "B") (Pat (NonTerminal "D") rest))
+)
+
+(let language (Pat (NonTerminal "S") (Nil)))
+
+(run-schedule (saturate (run)))
+
+(check (= language 
+  (Pat (Terminal "a") (Pat (Terminal "a") (Pat (Terminal "a") (Nil))) )
+))
