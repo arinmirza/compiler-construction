@@ -4,7 +4,6 @@
  */
 
 import { UniqueSet } from "./unique-set.ts";
-import { Sets } from "./utils.ts";
 
 export namespace CFG {
   export type Symbol = Terminal | NonTerminal;
