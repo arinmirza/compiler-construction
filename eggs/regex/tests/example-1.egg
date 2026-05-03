@@ -14,31 +14,33 @@
 
 (let root (Concat a0|b1* a2xa3|b4))
 
+(Root root)
+
 (run-schedule (saturate (run)))
 
 (check (= (first root) (set-of 0 1 2)))
 (check (= (last  root) (set-of 3 4)))
 (check (= (next  root) (set-of)))
-(fail (check (empty root)))
+(check (= (False) (empty root)))
 
 (check (= (first a0|b1*) (set-of 0 1)))
 (check (= (last  a0|b1*) (set-of 0 1)))
 (check (= (next  a0|b1*) (set-of 2)))
-(check (empty a0|b1*))
+(check (= (True) (empty a0|b1*)))
 
 (check (= (first a0|b1) (set-of 0 1)))
 (check (= (last  a0|b1) (set-of 0 1)))
 (check (= (next  a0|b1) (set-of 0 1 2)))
-(fail (check (empty a0|b1)))
+(check (= (False) (empty a0|b1)))
 
 (check (= (first a2xa3|b4) (set-of 2)))
 (check (= (last  a2xa3|b4) (set-of 3 4)))
 (check (= (next  a2xa3|b4) (set-of)))
-(fail (check (empty a2xa3|b4)))
+(check (= (False) (empty a2xa3|b4)))
 
 (check (= (first a3|b4) (set-of 3 4)))
 (check (= (last  a3|b4) (set-of 3 4)))
 (check (= (next  a3|b4) (set-of)))
-(fail (check (empty a3|b4)))
+(check (= (False) (empty a3|b4)))
 
 (pop)

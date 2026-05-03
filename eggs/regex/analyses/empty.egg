@@ -1,31 +1,62 @@
 (rule 
   (
     (= regex (Or r1 r2))
-    (empty r1)
+    (= (True) (empty r1))
   )
   (
-    (empty regex)
+    (set (empty regex) (True))
   )
 )
 
 (rule 
   (
     (= regex (Or r1 r2))
-    (empty r2)
+    (= (True) (empty r2))
   )
   (
-    (empty regex)
+    (set (empty regex) (True))
+  )
+)
+
+(rule 
+  (
+    (= regex (Or r1 r2))
+    (= (False) (empty r1))
+    (= (False) (empty r2))
+  )
+  (
+    (set (empty regex) (False))
   )
 )
 
 (rule 
   (
     (= regex (Concat r1 r2))
-    (empty r1)
-    (empty r2)
+    (= (True) (empty r1))
+    (= (True) (empty r2))
   )
   (
-    (empty regex)
+    (set (empty regex) (True))
+  )
+)
+
+(rule 
+  (
+    (= regex (Concat r1 r2))
+    (= (False) (empty r1))
+  )
+  (
+    (set (empty regex) (False))
+  )
+)
+
+(rule 
+  (
+    (= regex (Concat r1 r2))
+    (= (False) (empty r2))
+  )
+  (
+    (set (empty regex) (False))
   )
 )
 
@@ -34,7 +65,7 @@
     (= regex (Star r1))
   )
   (
-    (empty regex)
+    (set (empty regex) (True))
   )
 )
 
@@ -43,7 +74,7 @@
     (= regex (Opt r1))
   )
   (
-    (empty regex)
+    (set (empty regex) (True))
   )
 )
 
@@ -52,6 +83,15 @@
     (= regex (Epsilon))
   )
   (
-    (empty regex)
+    (set (empty regex) (True))
+  )
+)
+
+(rule 
+  (
+    (= regex (Letter _ _))
+  )
+  (
+    (set (empty regex) (False))
   )
 )

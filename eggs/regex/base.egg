@@ -7,9 +7,22 @@
   (Opt RegexTree)
 )
 
+; a set container for integers, stores the indexes for letters
 (sort IntSet (Set i64))
 
-(relation empty (RegexTree))
-(function first (RegexTree) IntSet :merge (set-union old new))
-(function next  (RegexTree) IntSet :merge (set-union old new)) 
-(function last  (RegexTree) IntSet :merge (set-union old new))
+; proper boolean sort. necessary for keeping `empty` analysis exact.
+; we need to be able to distinguish if a node is known to be non-empty
+; or whether the analysis value have not been computed yet.
+; if we cannot distinguish between them, the rules for e.g. concatenation
+; must become a lattice/merge analysis (monotone underapproximation). 
+(datatype Bool (True) (False))
+
+; marks the root of the regex tree. the value of the `empty` analysis 
+; will be set as empty-set for this node. Otherwise need to initialize every
+; node with empty, which makes the analysis a monotone underapproximation.
+(datatype Marker (Root RegexTree))
+
+(function empty (RegexTree) Bool :no-merge)
+(function first (RegexTree) IntSet :no-merge)
+(function next  (RegexTree) IntSet :no-merge) 
+(function last  (RegexTree) IntSet :no-merge)

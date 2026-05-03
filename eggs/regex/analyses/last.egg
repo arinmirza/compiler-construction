@@ -20,6 +20,7 @@
 (rule 
   (
     (= regex (Concat r1 r2))
+    (= (False) (empty r2))
     (= value (last r2))
   )
   (
@@ -30,8 +31,8 @@
 (rule 
   (
     (= regex (Concat r1 r2))
-    (empty r2)
-    (= value (last r1))
+    (= (True) (empty r2))
+    (= value (set-union (last r2) (last r1)))
   )
   (
     (set (last regex) value)

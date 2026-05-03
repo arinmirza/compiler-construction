@@ -1,9 +1,18 @@
-(rule ((= regex (Epsilon)))      ((set (next regex) (set-empty))))
-(rule ((= regex (Letter i x)))   ((set (next regex) (set-empty))))
-(rule ((= regex (Concat r1 r2))) ((set (next regex) (set-empty))))
-(rule ((= regex (Or r1 r2)))     ((set (next regex) (set-empty))))
-(rule ((= regex (Star r1)))      ((set (next regex) (set-empty))))
-(rule ((= regex (Opt r1)))       ((set (next regex) (set-empty))))
+; (rule ((= regex (Epsilon)))      ((set (next regex) (set-empty))))
+; (rule ((= regex (Letter i x)))   ((set (next regex) (set-empty))))
+; (rule ((= regex (Concat r1 r2))) ((set (next regex) (set-empty))))
+; (rule ((= regex (Or r1 r2)))     ((set (next regex) (set-empty))))
+; (rule ((= regex (Star r1)))      ((set (next regex) (set-empty))))
+; (rule ((= regex (Opt r1)))       ((set (next regex) (set-empty))))
+
+(rule
+  (
+    (Root regex)
+  )
+  (
+    (set (next regex) (set-empty))
+  )
+)
 
 (rule
   (
@@ -39,6 +48,7 @@
 (rule
   (
     (= regex (Concat r1 r2))
+    (= (False) (empty r2))
     (= value1 (first r2))
     (= value2 (next regex))
   )
@@ -51,10 +61,11 @@
 (rule
   (
     (= regex (Concat r1 r2))
-    (empty r2)
+    (= (True) (empty r2))
     (= value (next regex))
   )
   (
     (set (next r1) value)
+    (set (next r2) (set-empty))
   )
 )
