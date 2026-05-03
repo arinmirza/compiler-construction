@@ -69,3 +69,30 @@ export class UniqueSet<T extends Comparable<T>> {
     return `{${this.elements.map((e) => e.toString()).join(", ")}}`;
   }
 }
+
+export class UniqueMap<K extends Comparable<K>, V> {
+  elements: { key: K; value: V }[] = [];
+
+  get(key: K) {
+    return this.elements.find((e) => e.key.equals(key))?.value;
+  }
+
+  set(key: K, value: V) {
+    const elem = this.getOrSet(key, value);
+    elem.value = value;
+    return elem;
+  }
+
+  has(key: K) {
+    return !!this.get(key);
+  }
+
+  getOrSet(key: K, value: V) {
+    return (
+      this.elements.find((e) => e.key.equals(key)) ??
+      this.elements[this.elements.push({ key, value })]
+    );
+  }
+
+  
+}
