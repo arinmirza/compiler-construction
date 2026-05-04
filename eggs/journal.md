@@ -2,9 +2,9 @@
 
 ## 2026-05-04
 ### Attribute Grammars
-- I realized that implementing the analyses for a regex was substantially more convenient in egglog in comparison to implementing them in Typescript. 
+- I realized that implementing the analyses for a regex was substantially more convenient in egglog in contrast to implementing them in Typescript. 
   - In Typescript (or in any imperative language), I have to focus on the order of the computation, initialization, and propagation.
-  - In egglog however, I simply declared some algebraic types, and *declared* how the values are supposed to be determined, very close to their mathematical definitions. It is like saying *"This is how these things stand in relation to each other; now compute it"*.
+  - In egglog however, I simply defined some algebraic types, and *declared* how the analysis values are supposed to be determined, which can be formulated very close to their mathematical definitions. It is like saying *"This is how these things stand in relation to each other; now compute it"*.
   - The curious part is, I did not use any rewrites or equality-classes at all, which is supposed to be the core feature of egglog.
   - It turns out that the thing I am actually interested in is called **[attribute grammars](1)**, which supplement a formal grammar with semantic information.
     - Attributes computed the values of attributes of their children are called *synthesized attributes*. This corresponds to a bottom-up propagation.

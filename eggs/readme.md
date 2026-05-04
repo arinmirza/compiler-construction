@@ -2,7 +2,7 @@
 
 Navigate to the directory of interest.
 
-- `eggs/regex/` scannar implementation
+- `eggs/regex/` scanner implementation
 - `eggs/cfg/` context-free grammars
 
 Then run:
