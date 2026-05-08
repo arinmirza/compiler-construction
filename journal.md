@@ -1,5 +1,32 @@
 # Journal
 
+## 2026-05-07
+- One specific *derivation* corresponds to **at least one** derivation tree.
+  - Given a ~~trace~~ derivation, it is ambiguous if where the expansion will happen.
+- Given a fixed particular *derivation*, interpreting it consistenly rightmost or consistenly leftmost **does not** lead to the same derivation tree **in general**.
+  - $1+1+1$ can be parsed as $((1) + ((1) + (1)))$ or $(((1) + (1)) + (1))$.
+- Fixing one specific derivation tree corresponds to **at least one** derivation.
+  - Same reason as above.
+  - You can have a (single) grammar where the rightmost and the leftmost derivations lead to the same derivation tree.
+- Fixing one specific derivation tree corresponds to one specific leftmost derivation (analogously, one specific rightmost derivation).
+- An alternate way to produce a rightmost derivation is to
+  - (no) reverse a reverse leftmost derivation
+  - (yes) reverse a reverse rightmost derivation
+  - (no) reverse a leftmost derivation
+  - (no) produce leftmost derivation for the reversed terminal sequence
+    - we did not reverse the production rules (which may not be possible in general?)
+    - also reversing the terminal sequence never works (?)
+- Unique grammar does not mean that we always produce the same derivation.
+- Unique grammar means that derivation trees are
+  1. unique for a given word
+  1. equal for all valid derivations
+  1. esp. unfazed bz derivation concept that is used
+  1. esp. in general do not have a unique derivation
+  - 1 and 4 are not contradicting each other.
+- [?] PCP reduction: why do we add the integer sequences at the end if we were going to existentially quantify them?
+- The order of applying productivity and reachability matters!
+  - e.g. S -> aBB | bDA, A -> Bc (if D is removed because it was not productive)
+
 ## 2026-05-02
 - Grammars are *term rewriting systems*.
   - The rules offer feasible rewriting steps.
